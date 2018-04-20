@@ -1,0 +1,47 @@
+---
+- name: Install StrongSwan VPN server
+  hosts: {{ hostname }}
+  become: true
+  tasks:
+  - apt:
+      name: strongswan
+      state: present
+  - pip:
+      name: letsencrypt-apache
+  # todo: check if not already present
+  # - command: certbot certonly --apache -d {{ domain_name }}
+  - template:
+      src: ipsec.conf.j2
+      dest: /etc/ipsec.conf
+  - template:
+      src: ipsec.secrets.j2
+      dest: /etc/ipsec.secrets
+  - cron:
+      minute: "0"
+      hour: "0"
+      job: "/usr/local/bin/certbot renew --quiet"
+  - systemd:
+      name: strongswan
+      state: restarted
+  - iptables:
+      chain: INPUT
+      protocol: udp
+      to_ports: 500
+      jump: ACCEPT
+  - iptables:
+      chain: INPUT
+      protocol: udp
+      to_ports: 4500
+      jump: ACCEPT
+  # https://wiki.strongswan.org/projects/strongswan/wiki/ForwardingAndSplitTunneling
+  - sysctl:
+      name: net.ipv4.ip_forward
+      value: 1
+      sysctl_set: yes
+      state: present
+  - iptables:
+      table: nat
+      chain: POSTROUTING
+      out_interface: eth0
+      source: 192.168.11.0/24
+      jump: MASQUERADE

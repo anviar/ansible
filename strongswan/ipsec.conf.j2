@@ -1,0 +1,31 @@
+config setup
+	plutostart=no
+	uniqueids=never
+	charonstart=yes
+	charondebug="ike 1, knl 1, cfg 0"
+
+conn %default
+    keyexchange=ikev2
+    auto=add
+    rekey=no
+    reauth=no
+    fragmentation=yes
+    compress=yes
+
+    # left - local (server) side
+    left=%defaultroute
+    leftcert=/etc/letsencrypt/live/{{ domain_name }}/cert.pem
+    leftsendcert=always
+    leftsubnet=0.0.0.0/0
+    rightdns=8.8.8.8,8.8.4.4
+
+    # right - remote (client) side
+    eap_identity=%identity
+    rightsourceip=192.168.11.0/24
+    rightsendcert=never
+
+conn vpn-eap
+    rightauth=eap-mschapv2
+    leftid={{ domain_name }}
+
+include /var/lib/strongswan/ipsec.conf.inc
