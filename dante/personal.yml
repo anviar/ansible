@@ -1,0 +1,23 @@
+---
+- name: Install personal Socks5 proxy server
+  hosts: your-proxy-server-name
+  become: true
+  vars:
+    external_port: 1080
+  tasks:
+  - apt:
+      name: dante-server
+      state: present
+  - template:
+      src: danted.conf.j2
+      dest: /etc/danted.conf
+  - iptables:
+      chain: INPUT
+      protocol: tcp
+      in_interface: "{{ ansible_default_ipv4.interface }}"
+      destination_port: "{{ external_port }}"
+      jump: ACCEPT
+  - systemd:
+      name: danted
+      state: restarted
+      enabled: yes
