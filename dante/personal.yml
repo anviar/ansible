@@ -17,6 +17,7 @@
       in_interface: "{{ ansible_default_ipv4.interface }}"
       destination_port: "{{ external_port }}"
       jump: ACCEPT
+      comment: "socks5 proxy server"
   - systemd:
       name: danted
       state: restarted

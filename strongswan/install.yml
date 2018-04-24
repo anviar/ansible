@@ -29,12 +29,14 @@
       in_interface: "{{ ansible_default_ipv4.interface }}"
       to_ports: 500
       jump: ACCEPT
+      comment: "IKEv2 ISAKMP"
   - iptables:
       chain: INPUT
       protocol: udp
       in_interface: "{{ ansible_default_ipv4.interface }}"
       to_ports: 4500
       jump: ACCEPT
+      comment: "IKEv2 ESP"
   # https://wiki.strongswan.org/projects/strongswan/wiki/ForwardingAndSplitTunneling
   - sysctl:
       name: net.ipv4.ip_forward
