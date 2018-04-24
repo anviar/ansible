@@ -26,11 +26,13 @@
   - iptables:
       chain: INPUT
       protocol: udp
+      in_interface: "{{ ansible_default_ipv4.interface }}"
       to_ports: 500
       jump: ACCEPT
   - iptables:
       chain: INPUT
       protocol: udp
+      in_interface: "{{ ansible_default_ipv4.interface }}"
       to_ports: 4500
       jump: ACCEPT
   # https://wiki.strongswan.org/projects/strongswan/wiki/ForwardingAndSplitTunneling
@@ -42,6 +44,6 @@
   - iptables:
       table: nat
       chain: POSTROUTING
-      out_interface: eth0
+      out_interface: "{{ ansible_default_ipv4.interface }}"
       source: 192.168.11.0/24
       jump: MASQUERADE
