@@ -8,8 +8,9 @@
       state: present
   - pip:
       name: letsencrypt-apache
-  # todo: check if not already present
-  # - command: certbot certonly --apache -d {{ domain_name }}
+  - command: certbot certonly --apache -d {{ domain_name }}
+    args:
+      creates: /etc/letsencrypt/live/{{ domain_name }}/cert.pem
   - template:
       src: ipsec.conf.j2
       dest: /etc/ipsec.conf
