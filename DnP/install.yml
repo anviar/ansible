@@ -1,0 +1,107 @@
+---
+- name: Install DnP application server
+  hosts: amazon-dev
+  become: true
+  tasks:
+    - name: Create user
+      user:
+        name: '{{ system_user }}'
+        comment: Design and Pitch
+        shell: /bin/bash
+        home: '/opt/{{ system_user }}'
+    - name: Install proxy-server packages
+      apt:
+        name: dante-server
+        state: present
+    - name: Setup proxy config
+      template:
+        src: files/danted.conf.j2
+        dest: /etc/danted.conf
+    - name: Start proxy
+      systemd:
+        name: danted
+        state: restarted
+        enabled: yes
+    - name: Configure Node.JS repository
+      template:
+        src: files/nodesource.j2
+        dest: /etc/apt/sources.list.d/nodesource.list
+    - name: Install Node.JS apt key
+      apt_key:
+        url: https://deb.nodesource.com/gpgkey/nodesource.gpg.key
+        state: present
+    - name: Install Node.JS
+      apt:
+        update_cache: yes
+        name: nodejs
+        state: present
+    - name: copy bootstrap script
+      copy:
+        src: files/start.sh
+        dest: '/opt/{{ system_user }}/start.sh'
+        mode: a+rx
+    - name: Install DnP systemd unit
+      template:
+        src: files/dnp@.service.j2
+        dest: /etc/systemd/system/dnp@.service
+    - name: Configure Google Clud SDK repository
+      template:
+        src: files/google-cloud-sdk.j2
+        dest: /etc/apt/sources.list.d/nodesource.list
+    - name: Import the Google Cloud Platform public key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+    - name: Update the package list and install the Cloud SDK
+      apt:
+        update_cache: yes
+        name: google-cloud-sdk
+        state: present
+    - name: Install database engine
+      apt:
+        name: mariadb-server
+        state: present
+    - name: Install required Python MySQL connector
+      apt:
+        name: python-mysqldb
+        state: present
+    - name: "Create database: {{ mysql.database }}"
+      mysql_db:
+        name: "{{ mysql.database }}"
+        state: present
+    - name: Transfer database schema
+      copy:
+        src: files/schema.sql
+        dest: "/tmp/{{ mysql.database }}.sql"
+    - name: "Create schema for databse: {{ mysql.database }}"
+      mysql_db:
+        name: "{{ mysql.database }}"
+        state: import
+        target: "/tmp/{{ mysql.database }}.sql"
+    - mysql_user:
+        name: '{{ mysql.user }}'
+        password: '{{ mysql.password }}'
+        host: '{{ mysql.host}}'
+        priv: '{{ mysql.database }}.*:ALL'
+        state: present
+    # - iptables:
+    #     chain: INPUT
+    #     ctstate: ESTABLISHED,RELATED
+    #     jump: ACCEPT
+    # - iptables:
+    #     chain: INPUT
+    #     protocol: tcp
+    #     in_interface: "{{ ansible_default_ipv4.interface }}"
+    #     destination_port: 443
+    #     jump: ACCEPT
+    #     comment: "socks5 proxy server"
+    # - iptables:
+    #     chain: INPUT
+    #     protocol: tcp
+    #     in_interface: "{{ ansible_default_ipv4.interface }}"
+    #     destination_port: 22
+    #     jump: ACCEPT
+    #     comment: "SSH"
+    # - iptables:
+    #     chain: INPUT
+    #     policy: DROP

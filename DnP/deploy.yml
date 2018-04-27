@@ -1,0 +1,37 @@
+---
+- name: Deploy or update DnP release
+  hosts: dnp-web
+  vars:
+    version: 2.6
+    workdir: '/opt/{{ system_user }}'
+  tasks:
+  - local_action:
+      module: git
+      repo: 'git@github.com:damienslater/dnpServerApp.git'
+      version: 'dnp@{{ version }}'
+      dest: 'src/{{ version }}'
+  - file: path='{{ workdir }}' state=directory
+  - systemd:
+      name: 'dnp@{{ version }}'
+      state: stopped
+    become: yes
+  - synchronize:
+      src: 'src/{{ version }}'
+      dest: '{{ workdir }}'
+      checksum: yes
+      delete: yes
+      rsync_opts:
+        - "--exclude=.git*"
+    become: yes
+  - name: Fixing permissions
+    file:
+      path: '{{ workdir }}/{{ version }}'
+      owner: '{{ system_user }}'
+      group: '{{ system_user }}'
+      recurse: yes
+    become: yes
+  - systemd:
+      name: 'dnp@{{ version }}'
+      state: started
+      enabled: yes
+    become: yes

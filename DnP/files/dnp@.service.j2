@@ -1,0 +1,12 @@
+[Unit]
+	Description=Design & Pitch ( version %I )
+	After=mysql.service network.target
+[Service]
+	User={{ system_user }}
+	Environment=DNP_ROOT=/opt/{{ system_user }}
+	Environment=DNP_VERSION=%i
+	ExecStart=/opt/{{ system_user }}/start.sh
+	PIDFile=/opt/{{ system_user }}/%i/pid
+	Restart=always
+[Install]
+	WantedBy=multi-user.target
