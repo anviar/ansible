@@ -1,6 +1,6 @@
 ---
 - name: Install StrongSwan VPN server
-  hosts: {{ hostname }}
+  hosts: "{{ hostname }}"
   become: true
   tasks:
   - apt:
@@ -8,15 +8,21 @@
       state: present
   - pip:
       name: letsencrypt-apache
-  - command: certbot certonly --apache -d {{ domain_name }}
+  - command: certbot certonly --apache -d {{ vpn.domain_name }}
     args:
-      creates: /etc/letsencrypt/live/{{ domain_name }}/cert.pem
-  - template:
+      creates: /etc/letsencrypt/live/{{ vpn.domain_name }}/cert.pem
+  - name: Generate config
+    template:
       src: ipsec.conf.j2
       dest: /etc/ipsec.conf
-  - template:
+    tags:
+      - config
+  - name: Generate users
+    template:
       src: ipsec.secrets.j2
       dest: /etc/ipsec.secrets
+    tags:
+      - auth
   - cron:
       minute: "0"
       hour: "0"
@@ -24,6 +30,8 @@
   - systemd:
       name: strongswan
       state: restarted
+    tags:
+      - config
   - iptables:
       chain: INPUT
       protocol: udp

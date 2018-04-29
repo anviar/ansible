@@ -5,7 +5,6 @@ config setup
 	charondebug="ike 1, knl 1, cfg 0"
 
 conn %default
-    keyexchange=ikev2
     auto=add
     rekey=no
     reauth=no
@@ -14,9 +13,9 @@ conn %default
 
     # left - local (server) side
     left=%defaultroute
-    leftcert=/etc/letsencrypt/live/{{ domain_name }}/cert.pem
+    leftcert=/etc/letsencrypt/live/{{ vpn.domain_name }}/cert.pem
     leftsendcert=always
-    leftsubnet=0.0.0.0/0
+    leftsubnet={{ vpn.network }}
     rightdns=8.8.8.8,8.8.4.4
 
     # right - remote (client) side
@@ -24,8 +23,18 @@ conn %default
     rightsourceip=192.168.11.0/24
     rightsendcert=never
 
-conn vpn-eap
+conn vpn-ikev2
+		keyexchange=ikev2
     rightauth=eap-mschapv2
-    leftid={{ domain_name }}
+    leftid={{ vpn.domain_name }}
+
+conn vpn-ikev1
+		keyexchange=ikev1
+    rightauth=eap-mschapv2
+		leftauth=psk
+		# authby=xauthpsk
+		rightauth=psk
+		rightauth2=xauth
+
 
 include /var/lib/strongswan/ipsec.conf.inc
