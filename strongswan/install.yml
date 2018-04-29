@@ -52,9 +52,12 @@
       value: 1
       sysctl_set: yes
       state: present
+      tags:
+        - network
   - iptables:
       table: nat
       chain: POSTROUTING
-      out_interface: "{{ ansible_default_ipv4.interface }}"
-      source: 192.168.11.0/24
+      source: "{{ vpn.pool }}"
       jump: MASQUERADE
+    tags:
+      - network

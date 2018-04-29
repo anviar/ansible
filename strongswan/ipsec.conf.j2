@@ -15,22 +15,27 @@ conn %default
 	leftcert=/etc/letsencrypt/live/{{ vpn.domain_name }}/cert.pem
 	leftsendcert=always
 	leftsubnet={{ vpn.network }}
-	rightdns=8.8.8.8,8.8.4.4
+	leftid={{ vpn.domain_name }}
 
 	# right - remote (client) side
 	eap_identity=%identity
-	rightsourceip=192.168.11.0/24
+	rightsourceip={{ vpn.pool }}
 	rightsendcert=never
+	rightdns=8.8.8.8,8.8.4.4
 
 conn vpn-ikev2
 	compress=yes
 	keyexchange=ikev2
 	rightauth=eap-mschapv2
-	leftid={{ vpn.domain_name }}
 
 conn vpn-ikev1
 	keyexchange=ikev1
+	rekeymargin=3m
+	keyingtries=1
+
 	leftauth=psk
+
+	right=%any
 	rightauth=psk
 	rightauth2=xauth
 
