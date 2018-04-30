@@ -1,0 +1,12 @@
+/var/log/socks.log
+{
+	rotate 7
+	daily
+	missingok
+	notifempty
+	delaycompress
+	compress
+	postrotate
+		invoke-rc.d danted reload > /dev/null
+	endscript
+}

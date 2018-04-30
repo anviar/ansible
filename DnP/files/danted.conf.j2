@@ -1,8 +1,8 @@
 internal.protocol: ipv4
-internal: {{ ansible_default_ipv4.address }} port = 443
+internal: {{ ansible_default_ipv4.alias }} port = 443
 external.protocol: ipv4
 external: {{ ansible_lo.device }}
-logoutput: stderr
+logoutput: /var/log/socks.log
 user.privileged: proxy
 user.unprivileged: nobody
 user.libwrap: nobody
@@ -18,6 +18,9 @@ socks pass {
 }
 
 client pass {
-        from: 0/0 to: 0.0.0.0/0
-	log: error # connect disconnect
+	from: 0/0 to: 0.0.0.0/0
+	log: error connect
+	session.state.key: from
+	session.state.max: 50
+	session.state.throttle: 10/1
 }

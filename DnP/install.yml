@@ -1,6 +1,6 @@
 ---
 - name: Install DnP application server
-  hosts: amazon-dev
+  hosts: "{{ servername }}"
   become: true
   tasks:
     - name: Create user
@@ -17,11 +17,21 @@
       template:
         src: files/danted.conf.j2
         dest: /etc/danted.conf
+      tags:
+        - proxy
     - name: Start proxy
       systemd:
         name: danted
         state: restarted
         enabled: yes
+      tags:
+        - proxy
+    - name: Setup logrotate for proxy
+      template:
+        src: files/logrotate-dante
+        dest: /etc/logrotate.d/danted
+      tags:
+        - proxy
     - name: Configure Node.JS repository
       template:
         src: files/nodesource.j2
