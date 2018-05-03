@@ -14,7 +14,7 @@ conn %default
 	left=%defaultroute
 	leftcert=/etc/letsencrypt/live/{{ vpn.domain_name }}/cert.pem
 	leftsendcert=always
-	leftsubnet={{ vpn.network }}
+	leftsubnet={{ vpn.networks|join(',') }}
 	leftid={{ vpn.domain_name }}
 
 	# right - remote (client) side

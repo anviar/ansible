@@ -59,5 +59,6 @@
       chain: POSTROUTING
       source: "{{ vpn.pool }}"
       jump: MASQUERADE
+      comment: "masquerading"
     tags:
       - network
