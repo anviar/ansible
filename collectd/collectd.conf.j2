@@ -1,0 +1,27 @@
+Hostname    "{{ ansible_nodename|upper }}"
+FQDNLookup  true
+LoadPlugin  syslog
+LoadPlugin  cpu
+LoadPlugin  disk
+LoadPlugin  interface
+LoadPlugin  load
+LoadPlugin  memory
+LoadPlugin  contextswitch
+LoadPlugin  processes
+LoadPlugin  tcpconns
+LoadPlugin  write_graphite
+<Plugin "write_graphite">
+	<Node "{{ ansible_nodename|lower }}">
+		Host "{{ graphite_host }}"
+		Port "2003"
+		Prefix "collectd."
+		Protocol "tcp"
+		EscapeCharacter "_"
+		SeparateInstances true
+		StoreRates true
+		AlwaysAppendDS false
+	</Node>
+</Plugin>
+<Plugin "tcpconns">
+  AllPortsSummary true
+</Plugin>

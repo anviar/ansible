@@ -1,0 +1,43 @@
+---
+- name: Install collectd on legacy OS
+  hosts: ovh9 ovh8
+  vars:
+    version: 5.7.2
+    checksum: sha256:9d20a0221569a8d6b80bbc52b86e5e84965f5bafdbf5dfc3790e0fed0763e592
+  tasks:
+    - local_action:
+        module: get_url
+        url: "https://storage.googleapis.com/collectd-tarballs/collectd-{{ version }}.tar.bz2"
+        dest: "/tmp/collectd-{{ version }}.tar.bz2"
+        checksum: "{{ checksum }}"
+    - unarchive:
+        src: "/tmp/collectd-{{ version }}.tar.bz2"
+        dest: "{{ ansible_env.HOME }}"
+        creates: "{{ ansible_env.HOME }}/collectd-{{ version }}"
+    - name: Configure
+      command: ./configure --enable-all-plugins
+      args:
+        chdir: "{{ ansible_env.HOME }}/collectd-{{ version }}"
+        creates: "{{ ansible_env.HOME }}/collectd-{{ version }}/Makefile"
+    - make:
+        chdir: "{{ ansible_env.HOME }}/collectd-{{ version }}"
+    - block:
+        - name: install
+          make:
+            chdir: "{{ ansible_env.HOME }}/collectd-{{ version }}"
+            target: install
+        - name: install init-script
+          copy:
+            src: init.d-collectd
+            dest: /etc/init.d/collectd
+            mode: a+x
+        - name: install default configuration
+          template:
+            src: collectd.conf.j2
+            dest: /etc/collectd.conf
+        - name: Setup service
+          service:
+            name: collectd
+            state: started
+            enabled: yes
+      become: true
