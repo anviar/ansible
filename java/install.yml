@@ -1,9 +1,9 @@
 ---
 - name: Install Oracle Java
-  hosts: webnx4
+  hosts: webnx7
   vars:
     version: 8u171
-    alternative: /usr/java/jre1.8.0_171-amd64/bin/java
+    path_version: jre1.8.0_171
   tasks:
     - block:
       - copy:
@@ -15,9 +15,21 @@
             state: present
         - alternatives:
             name: java
-            path: "{{ alternative }}"
+            path: "/usr/java/{{ path_version }}-amd64/bin/java"
         become: true
       - file:
           state: absent
           path: "/tmp/jre-{{ version }}-linux-x64.rpm"
       when: ansible_pkg_mgr == "yum"
+    - block:
+      - file:
+          path: /usr/lib/jvm
+          state: directory
+      - unarchive:
+          src: "files/jre-{{ version }}-linux-x64.tar.gz"
+          dest: /usr/lib/jvm
+      - alternatives:
+          name: java
+          path: "/usr/lib/jvm/{{ path_version }}/bin/java"
+      become: true
+      when: ansible_pkg_mgr == "apt"
