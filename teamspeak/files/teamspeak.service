@@ -1,0 +1,15 @@
+[Unit]
+Description=TeamSpeak 3 Server
+Documentation=http://www.teamspeak.com/?page=literature
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/teamspeak3-server_linux_amd64
+User=nobody
+Environment=LD_LIBRARY_PATH=/opt/teamspeak3-server_linux_amd64:$LD_LIBRARY_PATH
+Environment=TS3SERVER_LICENSE=accept
+ExecStart=/opt/teamspeak3-server_linux_amd64/ts3server
+
+
+[Install]
+WantedBy=multi-user.target

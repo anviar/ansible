@@ -1,0 +1,24 @@
+---
+- name: Install TeamSpeak Server
+  hosts: vfedora
+  become: true
+  vars:
+    version: "3.3.1"
+  tasks:
+  - unarchive:
+      src: "files/teamspeak3-server_linux_amd64-{{ version }}.tar.bz2"
+      dest: /opt
+  - name: Setting file attributes
+    file:
+      path: /opt/teamspeak3-server_linux_amd64
+      owner: nobody
+      recurse: true
+  - name: Installing service
+    copy:
+      src: "files/teamspeak.service"
+      dest: "/etc/systemd/system/teamspeak.service"
+  - systemd:
+      state: started
+      daemon_reload: yes
+      enabled: yes
+      name: teamspeak
