@@ -4,10 +4,26 @@
   become: true
   vars:
     version: "3.3.1"
+    checksum: b3891341a9ff4c4b6b0173ac57f1d64d4752550c95eeb26d2518ac2f5ca9fbc1
   tasks:
+  - name: Check service existence
+    stat:
+      path: /etc/systemd/system/teamspeak.service
+    register: service_exist
+  - name: Stopping service
+    systemd:
+      name: teamspeak
+      state: stopped
+    when: service_exist.stat.exists == True
+  - name: Download distribution
+    get_url:
+      url: "http://dl.4players.de/ts/releases/{{ version }}/teamspeak3-server_linux_amd64-{{ version }}.tar.bz2"
+      dest: /tmp/teamspeak3-server.tar.bz2
+      checksum: "sha256:{{ checksum }}"
   - unarchive:
-      src: "files/teamspeak3-server_linux_amd64-{{ version }}.tar.bz2"
+      src: /tmp/teamspeak3-server.tar.bz2
       dest: /opt
+      remote_src: yes
   - name: Setting file attributes
     file:
       path: /opt/teamspeak3-server_linux_amd64
@@ -15,8 +31,8 @@
       recurse: true
   - name: Installing service
     copy:
-      src: "files/teamspeak.service"
-      dest: "/etc/systemd/system/teamspeak.service"
+      src: files/teamspeak.service
+      dest: /etc/systemd/system/teamspeak.service
   - systemd:
       state: started
       daemon_reload: yes
