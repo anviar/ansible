@@ -1,0 +1,47 @@
+---
+- name: Install modern Python
+  hosts: webnx
+  become: true
+  vars:
+    pyversion: 36
+    pymodules:
+      - mysql-connector-python
+      - sqlalchemy
+      - configobj
+      - beautifulsoup4
+      - pymongo
+      - requests
+      - psutil
+      - passgen
+      - redis
+      - certbot
+      - csvkit
+  tasks:
+  - name: Install repo
+    yum:
+      name: centos-release-scl
+      state: installed
+  - name: Install python
+    yum:
+      name: "rh-python{{ pyversion }}"
+      state: installed
+  - name: Update shell profile
+    template:
+      src: profile.j2
+      dest: "/etc/profile.d/rh-python.sh"
+      mode: a+x
+  - name: Update pip module
+    pip:
+      name: pip
+      executable: "/opt/rh/rh-python{{ pyversion }}/root/usr/bin/pip"
+      state: latest
+  - name: Update setuptools module
+    pip:
+      name: setuptools
+      executable: "/opt/rh/rh-python{{ pyversion }}/root/usr/bin/pip"
+      state: latest
+  - name: Install other requirements
+    pip: 
+      name: "{{ pymodules | join(' ') }}"
+      executable: "/opt/rh/rh-python{{ pyversion }}/root/usr/bin/pip"
+      state: latest

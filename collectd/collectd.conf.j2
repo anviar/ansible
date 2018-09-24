@@ -1,4 +1,4 @@
-Hostname    "{{ ansible_nodename|upper }}"
+Hostname    "{{ inventory_hostname|upper }}"
 FQDNLookup  true
 LoadPlugin  syslog
 LoadPlugin  cpu
@@ -11,7 +11,7 @@ LoadPlugin  processes
 LoadPlugin  tcpconns
 LoadPlugin  write_graphite
 <Plugin "write_graphite">
-	<Node "{{ ansible_nodename|lower }}">
+	<Node "{{ inventory_hostname|lower }}">
 		Host "{{ graphite_host }}"
 		Port "2003"
 		Prefix "collectd."
