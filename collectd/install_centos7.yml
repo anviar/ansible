@@ -1,0 +1,19 @@
+---
+- name: Deploy collectd.conf
+  hosts: codero_d
+  become: true
+  tasks:
+  - name: Install packages
+    yum:
+      name: collectd
+      state: installed
+  - name: Deploying /etc/collectd.conf
+    template:
+      src: collectd.conf.j2
+      dest: /etc/collectd.conf
+  - name: Restart systemd service
+    systemd:
+      state: restarted
+      enabled: yes
+      name: collectd
+  
