@@ -1,5 +1,6 @@
 Hostname    "{{ inventory_hostname|upper }}"
 FQDNLookup  true
+Interval 30.0
 LoadPlugin  syslog
 LoadPlugin  cpu
 LoadPlugin  disk
@@ -10,6 +11,8 @@ LoadPlugin  contextswitch
 LoadPlugin  processes
 LoadPlugin  tcpconns
 LoadPlugin  write_graphite
+LoadPlugin  exec
+
 <Plugin "write_graphite">
 	<Node "{{ inventory_hostname|lower }}">
 		Host "{{ graphite_host }}"
