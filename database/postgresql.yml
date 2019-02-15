@@ -1,0 +1,24 @@
+---
+- name: Install PostgresqSQL server
+  hosts: vcentos
+  become: true
+  tasks:
+  - selinux:
+      state: disabled
+  - name: PostgreSQL repository install
+    yum:
+      name: https://download.postgresql.org/pub/repos/yum/11/redhat/rhel-7-x86_64/pgdg-centos11-11-2.noarch.rpm
+      state: present
+  - name: Database install
+    yum:
+      name: postgresql11-server
+      state: present
+  - name: Init Database
+    command: /usr/pgsql-11/bin/postgresql-11-setup initdb
+    args:
+      creates: /var/lib/pgsql/11/data/PG_VERSION
+  - name: Starting service
+    systemd:
+      name: postgresql-11
+      state: started
+      enabled: yes

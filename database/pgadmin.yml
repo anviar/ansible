@@ -1,0 +1,44 @@
+---
+- name: Install pgAdmin 4 server
+  hosts: vcentos
+  become: true
+  tasks:
+  - selinux:
+      state: disabled
+  - name: PostgreSQL repository install
+    yum:
+      name: https://download.postgresql.org/pub/repos/yum/11/redhat/rhel-7-x86_64/pgdg-centos11-11-2.noarch.rpm
+      state: present
+  - name: EPEL repository install
+    yum:
+      name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+      state: present
+  - name: pgAdmin install
+    yum:
+      name: pgadmin4
+      state: present
+  - name: /etc/httpd/conf.d/pgadmin4.conf
+    copy:
+      remote_src: yes
+      src: /etc/httpd/conf.d/pgadmin4.conf.sample
+      dest: /etc/httpd/conf.d/pgadmin4.conf
+      backup: yes
+  # python /usr/lib/python2.7/site-packages/pgadmin4-web/setup.py
+  # chown -R apache:apache /var/lib/pgadmin
+  # chown -R apache:apache /var/log/pgadmin
+  - name: Reloading Apache
+    systemd:
+      name: httpd
+      state: reloaded
+      enabled: yes
+  - name: Openning WEB port
+    firewalld:
+      service: http
+      zone: public
+      permanent: yes
+      state: enabled
+  - name: Reloading firewalld
+    systemd:
+      name: firewalld
+      state: reloaded
+      enabled: yes

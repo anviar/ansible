@@ -1,0 +1,19 @@
+---
+- name: Install MySQL community server
+  hosts: vcentos
+  become: true
+  tasks:
+  - name: Install repo
+    yum:
+      name:  http://repo.mysql.com/yum/mysql-8.0-community/el/7/x86_64/mysql80-community-release-el7-2.noarch.rpm
+      state: present
+  - name: Install server
+    yum:
+      name:  mysql-community-server
+      state: present
+  - systemd:
+      name: mysqld
+      state: started
+      enabled: yes
+  # grep 'temporary password' /var/log/mysqld.log
+  # ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
