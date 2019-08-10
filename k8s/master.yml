@@ -1,0 +1,13 @@
+---
+- name: "Install Master node for Kubernetes cluster"
+  become: true
+  hosts: k8s:!k8s_nodes
+  roles:
+    - common
+    - docker
+    - role: k8s
+      vars:
+        packages:
+          - kubectl
+          - kubeadm
+    - init

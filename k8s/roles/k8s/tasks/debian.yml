@@ -1,0 +1,15 @@
+- name: Installing apt-transport-https
+  apt:
+    name: apt-transport-https
+    state: present
+- apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+- apt_repository:
+    repo: deb https://apt.kubernetes.io/ kubernetes-{{ ansible_distribution_release }} main
+    state: present
+    filename: kubernetes
+- apt:
+    name: "{{ packages |join(',') }}"
+    update_cache: yes
+- import_tasks: common.yml

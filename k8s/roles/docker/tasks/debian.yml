@@ -1,0 +1,14 @@
+- name: Installing requirements for Docker
+  apt:
+    name: apt-transport-https,certificates,curl,gnupg2,software-properties-common
+    state: present
+- apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+- apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/debian {{ ansible_distribution_release }} stable
+    state: present
+    filename: docker
+- apt:
+    name: docker-ce,docker-ce-cli,containerd.io
+    update_cache: yes

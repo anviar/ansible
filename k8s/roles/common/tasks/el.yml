@@ -1,0 +1,20 @@
+- selinux:
+    state: disabled
+- name: Whitelisting IPs
+  firewalld:
+    source: "{{ item.ip }}"
+    permanent: yes
+    zone: trusted
+    state: enabled
+  with_items: "{{ k8s_hosts }}"
+# TODO: how to execute only if any changes happened
+- name: Reload firewalld
+  systemd:
+    state: reloaded
+    name: firewalld
+- name: Adding hosts entries
+  lineinfile:
+    path: /etc/hosts
+    line: "{{ item.ip }}    {{ item.host }} {{ item.host }}.{{ domain }}"
+    state: present
+  with_items: "{{ k8s_hosts }}"

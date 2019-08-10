@@ -1,0 +1,14 @@
+- name: Initialize the cluster
+  shell: kubeadm init >> $HOME/kubeadm_init.log
+  args:
+    creates: $HOME/kubeadm_init.log
+- name: Copy ~/.kube/config
+  copy:
+    src: /etc/kubernetes/admin.conf
+    dest: $HOME/.kube/config
+    remote_src: yes
+- name: Fetching kubelet.conf
+  fetch:
+    src: /etc/kubernetes/kubelet.conf
+    dest: ./
+    flat: yes

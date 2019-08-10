@@ -1,0 +1,13 @@
+- name: Creating directory /var/lib/kubelet/
+  file:
+    path: /var/lib/kubelet/
+    state: directory
+- name: Deploying kubelet configuration
+  copy:
+    src: kubelet.conf
+    dest: /var/lib/kubelet/config.yaml
+- name: Starting kubelet
+  systemd:
+    state: started
+    enabled: yes
+    name: kubelet

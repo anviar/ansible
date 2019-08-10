@@ -1,0 +1,19 @@
+- name: Installing requirements for Docker
+  yum:
+    name: yum-utils,device-mapper-persistent-data,lvm2
+    state: present
+- name: Installing Docker repository
+  command: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  args:
+    creates: /etc/yum.repos.d/docker-ce.repo
+- yum:
+    name: docker-ce,docker-ce-cli,containerd.io
+    state: present
+- name: Installing /etc/docker/daemon.json
+  copy:
+    src: files/daemon.json
+    dest: /etc/docker/
+- systemd:
+    state: started
+    enabled: yes
+    name: docker
