@@ -1,0 +1,7 @@
+- name: "Install cluster nodes"
+  become: true
+  hosts: docker
+  roles:
+    - common
+    - engine
+    - compose

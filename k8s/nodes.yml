@@ -2,10 +2,10 @@
   become: true
   hosts: k8s:&k8s_nodes
   roles:
-    # - common
-    # - docker
-    # - role: k8s
-    #   vars:
-    #     packages:
-    #       - kubeadm
-    - join
+    - common
+    - docker
+    - role: k8s
+      vars:
+        packages:
+          - kubeadm
+    # - join

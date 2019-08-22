@@ -1,0 +1,11 @@
+- name: Installing Docker repository
+  command: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  args:
+    creates: /etc/yum.repos.d/docker-ce.repo
+- yum:
+    name: docker-ce,docker-ce-cli,containerd.io
+    state: present
+- systemd:
+    state: started
+    enabled: yes
+    name: docker

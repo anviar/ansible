@@ -1,0 +1,4 @@
+- name: Installing requirements for Docker
+  apt:
+    name: apt-transport-https,ca-certificates,curl,gnupg2,software-properties-common,python3,python3-pip
+    state: present
