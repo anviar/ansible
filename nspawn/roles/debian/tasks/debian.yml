@@ -1,0 +1,34 @@
+- apt:
+    name: debootstrap
+    state: present
+
+- name: debootstrap (it will take long time)
+  command: 'debootstrap --include=systemd-container {{ release }} /var/lib/machines/{{ release }}'
+  args:
+    creates: '/var/lib/machines/{{ release }}'
+  register: debootstrap
+
+- name: Allow unsecure root login first time to set the password
+  lineinfile:
+    path: '/var/lib/machines/{{ release }}/etc/shadow'
+    regexp: '^root:'
+    line: 'root::18137:0:99999:7:::'
+    # validate: pwck -q
+  when: debootstrap.changed
+
+- name: Allow machinectl login
+  lineinfile:
+    path: '/var/lib/machines/{{ release }}/etc/securetty'
+    line: 'pts/0'
+    state: present
+
+- systemd:
+    name: 'systemd-nspawn@{{ release }}'
+    state: started
+
+- debug:
+    msg:
+    - 'You can use command'
+    - '$ machinectl login {{ release }}'
+    - 'to login as root and set the password'
+    - 'TODO: to think about network interface ve-{{ release }}'

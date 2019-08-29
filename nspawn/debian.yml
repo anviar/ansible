@@ -1,0 +1,7 @@
+- name: "Deploy debian container"
+  become: true
+  hosts: docker
+  vars:
+    release: buster
+  roles:
+    - debian

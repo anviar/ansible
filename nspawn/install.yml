@@ -1,0 +1,5 @@
+- name: "Install systemd-nspawn engine"
+  become: true
+  hosts: docker
+  roles:
+    - install

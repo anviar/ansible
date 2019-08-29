@@ -1,0 +1,5 @@
+# - name:
+#   import_tasks: el.yml
+#   when: ansible_facts['os_family']|lower == 'redhat'
+- import_tasks: debian.yml
+  when: ansible_facts['os_family']|lower == 'debian'

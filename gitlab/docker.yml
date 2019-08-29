@@ -1,0 +1,18 @@
+- name: "Install GitLab server"
+  become: true
+  hosts: docker
+  tasks:
+  - docker_compose:
+      project_name: gitlab_dev
+      definition:
+        web:
+          image: 'gitlab/gitlab-ce:latest'
+          restart: always
+          hostname: '{{ gitlab_host }}'
+          environment:
+            GITLAB_OMNIBUS_CONFIG: |
+              external_url 'http://{{ gitlab_host }}'
+          ports:
+            - '80:80'
+            - '443:443'
+            - '22:22'
