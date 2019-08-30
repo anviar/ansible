@@ -1,0 +1,47 @@
+- name: 'Create /var/lib/machines/{{ machine_name }}'
+  file:
+    path: '/var/lib/machines/{{ machine_name }}'
+    state: directory
+  register: dstpath
+
+- name: Install base image
+  unarchive:
+    src: '{{ base_image_url }}'
+    dest: '/var/lib/machines/{{ machine_name }}'
+    remote_src: yes
+  when: dstpath.changed
+
+- name: Allow unsecure root login first time to set the password
+  lineinfile:
+    path: '/var/lib/machines/{{ machine_name }}/etc/shadow'
+    regexp: '^root:'
+    line: 'root:::0:::::'
+    # validate: pwck -q
+  when: dstpath.changed
+
+- name: Disable ttyN
+  replace:
+    path: '/var/lib/machines/{{ machine_name }}/etc/inittab'
+    regexp: '^(tty[0-9]::respawn:/sbin/getty 38400 tty[0-9])'
+    replace: '# \1'
+
+- name: Prepare console
+  lineinfile:
+    path: '/var/lib/machines/{{ machine_name }}/etc/inittab'
+    line: 'console::respawn:/sbin/getty 38400 console'
+
+- name: Prepare pts/0
+  lineinfile:
+    path: '/var/lib/machines/{{ machine_name }}/etc/securetty'
+    line: 'pts/0'
+
+# - systemd:
+#     name: 'systemd-nspawn@{{ machine_name }}'
+#     state: started
+
+- debug:
+    msg:
+    - 'You can NOT use command'
+    - '$ machinectl login {{ machine_name }}'
+    # - 'to login as root and set the password'
+    - 'TODO: to think about network interface ve-{{ machine_name }}'

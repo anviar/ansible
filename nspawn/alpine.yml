@@ -1,0 +1,8 @@
+- name: "Deploy Alpine container"
+  become: true
+  hosts: docker
+  vars:
+    base_image_url: http://dl-cdn.alpinelinux.org/alpine/v3.10/releases/x86_64/alpine-minirootfs-3.10.2-x86_64.tar.gz
+    machine_name: alpine
+  roles:
+    - alpine
