@@ -1,0 +1,22 @@
+---
+- name: Install MTproxy
+  hosts: "{{ hostname }}"
+  become: true
+  tasks:
+    - name: Stop a container
+      docker_container:
+        image: anviar/mtproxy
+        name: mtproxy.anviar
+        state: stopped
+    - docker_image:
+        name: anviar/mtproxy
+        tag: latest
+        source: pull
+    - docker_container:
+        image: anviar/mtproxy
+        name: mtproxy.anviar
+        ports:
+        - "4443:443"
+        env:
+          SECRET: "{{ SECRET }}"
+          PORT: "4443"
